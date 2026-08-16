@@ -1,0 +1,2 @@
+# One-off build tooling (maintainers). Not needed for `setup_widget.bat`.
+pyinstaller~=6.11

@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.venv-build/
+
+# Test / coverage / type / lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# TLS material — never commit private keys
+certs/
+
+# Machine-specific runtime (auto-created on first run)
+config.json
+inbox.json
+
+# Local analysis exports (never publish)
+Docs/
+
+# ProMem — personal process memory, analyses, handoffs (local only; not for GitHub)
+.pm/
+
+# Binary archives / duplicate widget bundles (not source)
+build/
+dist/*
+!dist/README.md
+!dist/README.tr.md
+*.zip
+*.7z
+R-Ctrl-Widget/
+
+# Agent instructions (local only — for Cursor/Claude; not published)
+AGENTS.md
+AGENTS.tr.md
+CLAUDE.md
+CLAUDE.tr.md
+.cursorrules
+
+# Agent / editor local settings
+.claude/
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

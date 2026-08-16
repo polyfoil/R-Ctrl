@@ -1,0 +1,10 @@
+# R-Ctrl local browser server — binds to localhost only.
+# TLS is intentionally not used: localhost is already a secure context for
+# getUserMedia, so no certificate (and no `cryptography`) is required.
+fastapi~=0.136
+uvicorn[standard]~=0.42
+faster-whisper~=1.2
+numpy~=2.2
+keyboard~=0.13
+pyperclip~=1.11
+python-multipart~=0.0.20

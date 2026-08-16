@@ -1,0 +1,75 @@
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "C4",   # comprehensions
+]
+ignore = [
+    "E501",  # line length is handled by the formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests deliberately poke at private members and build throwaway doubles.
+"tests/*" = ["B011", "SIM117"]
+# B008 flags `Depends()`/`File()` in argument defaults, which is exactly how
+# FastAPI declares dependencies — a false positive for this framework.
+"rctrl_server.py" = ["B008"]
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+# Third-party audio/ML libraries ship no stubs.
+ignore_missing_imports = true
+files = ["core", "tests"]
+
+# PyQt6's stubs declare `QMenu.addAction()` and `QMenu.addMenu()` as returning
+# `QAction | None` / `QMenu | None`. They never return None in practice, and
+# guarding ~20 call sites would add noise without adding safety. Only this one
+# error class is silenced, and only in the menu-building file — every other
+# mypy check still applies there.
+[[tool.mypy.overrides]]
+module = "rctrl_widget"
+disable_error_code = ["union-attr"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-q --cov --cov-report=term-missing -m 'not slow'"
+markers = [
+    "smoke: drives a real entry point end to end with fakes",
+    "slow: real Whisper model; run with RCTRL_E2E=1 pytest -m slow",
+]
+
+[tool.coverage.run]
+# Whole application, not just core/. Reporting core/'s number alone once made
+# coverage look like 97% when the project was really at ~35%.
+source = ["."]
+omit = [
+    "tests/*",
+    "*/site-packages/*",
+    ".venv/*",
+    "R-Ctrl-Widget/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+# Ratchet, not an aspiration: the suite currently sits at ~71%. The remaining
+# gap is mostly RCtrlWidget menu paths. Raise when that changes; never lower.
+fail_under = 60
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "def main\\(",
+]

@@ -1,0 +1,9 @@
+# R-Ctrl floating widget (primary mode) — local GPU, no API key needed.
+# Install: setup_widget.bat
+PyQt6~=6.8
+faster-whisper~=1.2
+sounddevice~=0.5
+numpy~=2.2
+keyboard~=0.13
+pyperclip~=1.11
+onnxruntime~=1.20

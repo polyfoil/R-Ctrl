@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>R-Ctrl — Whisperer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #e5e5e5;
+      --muted: #555;
+      --accent: #2563eb;
+      --danger: #dc2626;
+      --warn: #ca8a04;
+      --ok: #16a34a;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.75rem;
+      padding: 2rem 1.5rem;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    #status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    #dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    #dot.ok  { background: var(--ok); }
+    #dot.err { background: var(--danger); }
+    #dot.warn { background: var(--warn); }
+
+    #mode-bar {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .mode-btn {
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    #mic-btn {
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      border: 2.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      position: relative;
+    }
+    #mic-btn::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    #mic-btn.recording {
+      background: var(--danger);
+      border-color: var(--danger);
+      box-shadow: 0 0 0 16px rgba(220,38,38,.15),
+                  0 0 0 32px rgba(220,38,38,.07);
+    }
+    #mic-btn.processing {
+      background: var(--warn);
+      border-color: var(--warn);
+    }
+
+    #mic-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    #transcript {
+      width: 100%;
+      max-width: 420px;
+      min-height: 90px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.1rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      word-break: break-word;
+      white-space: pre-wrap;
+      transition: border-color 0.2s;
+    }
+    #transcript.has-text { border-color: #3a3a3a; }
+
+    #actions {
+      display: flex;
+      gap: 0.75rem;
+      width: 100%;
+      max-width: 420px;
+    }
+    .act-btn {
+      flex: 1;
+      padding: 0.8rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .act-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    .act-btn:active { opacity: 0.7; transform: scale(0.97); }
+    .act-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+    #elapsed {
+      font-size: 0.7rem;
+      color: #3a3a3a;
+      height: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<div id="status-bar">
+  <span id="dot"></span>
+  <span id="status-text">Connecting...</span>
+</div>
+
+<div id="mode-bar">
+  <button class="mode-btn active" id="btn-hold">Hold</button>
+  <button class="mode-btn"       id="btn-toggle">Toggle</button>
+</div>
+
+<button id="mic-btn" aria-label="Microphone">🎙</button>
+<div id="mic-label">HOLD TO TALK</div>
+
+<div id="transcript">—</div>
+
+<div id="actions">
+  <button class="act-btn primary" id="type-btn" disabled>📥 Save to Inbox</button>
+  <button class="act-btn"         id="copy-btn" disabled>📋 Copy</button>
+</div>
+
+<div id="elapsed"></div>
+
+<script>
+  const dot        = document.getElementById('dot');
+  const statusTxt  = document.getElementById('status-text');
+  const micBtn     = document.getElementById('mic-btn');
+  const micLabel   = document.getElementById('mic-label');
+  const transcEl   = document.getElementById('transcript');
+  const typeBtn    = document.getElementById('type-btn');
+  const copyBtn    = document.getElementById('copy-btn');
+  const elapsedEl  = document.getElementById('elapsed');
+  const btnHold    = document.getElementById('btn-hold');
+  const btnToggle  = document.getElementById('btn-toggle');
+
+  let mode        = 'hold';
+  let recording   = false;
+  let mediaRec    = null;
+  let micStream   = null;
+  let chunks      = [];
+  let lastText    = '';
+
+  btnHold.onclick = () => {
+    mode = 'hold';
+    btnHold.classList.add('active');
+    btnToggle.classList.remove('active');
+    micLabel.textContent = 'HOLD TO TALK';
+  };
+  btnToggle.onclick = () => {
+    mode = 'toggle';
+    btnToggle.classList.add('active');
+    btnHold.classList.remove('active');
+    micLabel.textContent = 'TAP TO RECORD / TAP TO STOP';
+  };
+
+  const RETRY_MIN = 2000, RETRY_MAX = 60000;
+  let retryDelay = RETRY_MIN;
+  let retryTimer = null;
+
+  function scheduleHealthCheck(delay) {
+    clearTimeout(retryTimer);
+    // Don't keep polling a background tab; resume on visibilitychange.
+    if (document.visibilityState === 'hidden') return;
+    retryTimer = setTimeout(checkHealth, delay);
+  }
+
+  async function checkHealth() {
+    try {
+      const r    = await fetch('/health', {signal: AbortSignal.timeout(3000)});
+      const data = await r.json();
+      if (data.ready) {
+        setStatus('ok', `Ready — ${data.model}/${data.device}`);
+        retryDelay = RETRY_MIN;
+      } else {
+        setStatus('warn', 'Loading model...');
+        scheduleHealthCheck(RETRY_MIN);
+      }
+    } catch {
+      setStatus('err', 'Could not connect to server');
+      // Back off so a closed server doesn't mean an endless request loop.
+      scheduleHealthCheck(retryDelay);
+      retryDelay = Math.min(retryDelay * 2, RETRY_MAX);
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      retryDelay = RETRY_MIN;
+      checkHealth();
+    }
+  });
+  checkHealth();
+
+  function setStatus(cls, msg) {
+    dot.className = cls;
+    statusTxt.textContent = msg;
+  }
+
+  function encodeWav(audioBuffer) {
+    const data = audioBuffer.getChannelData(0);
+    const sr   = audioBuffer.sampleRate;
+    const buf  = new ArrayBuffer(44 + data.length * 2);
+    const v    = new DataView(buf);
+    const ws   = (off, s) => [...s].forEach((c, i) => v.setUint8(off+i, c.charCodeAt(0)));
+
+    ws(0, 'RIFF'); v.setUint32(4, 36 + data.length * 2, true);
+    ws(8, 'WAVE');
+    ws(12, 'fmt '); v.setUint32(16, 16, true);
+    v.setUint16(20, 1, true);
+    v.setUint16(22, 1, true);
+    v.setUint32(24, sr, true);
+    v.setUint32(28, sr * 2, true);
+    v.setUint16(32, 2, true);
+    v.setUint16(34, 16, true);
+    ws(36, 'data'); v.setUint32(40, data.length * 2, true);
+
+    let off = 44;
+    for (const s of data) {
+      v.setInt16(off, Math.max(-1, Math.min(1, s)) * 0x7FFF, true);
+      off += 2;
+    }
+    return new Blob([buf], {type: 'audio/wav'});
+  }
+
+  async function blobToWav(blob) {
+    const ab      = await blob.arrayBuffer();
+    const actx    = new AudioContext();
+    const decoded = await actx.decodeAudioData(ab);
+    await actx.close();
+
+    const SR     = 16000;
+    const len    = Math.ceil(decoded.duration * SR);
+    const offCtx = new OfflineAudioContext(1, len, SR);
+    const src    = offCtx.createBufferSource();
+    src.buffer   = decoded;
+    src.connect(offCtx.destination);
+    src.start(0);
+    const rendered = await offCtx.startRendering();
+    return encodeWav(rendered);
+  }
+
+  async function startRec() {
+    if (recording) return;
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({audio: true, video: false});
+    } catch {
+      setStatus('err', 'Microphone access denied');
+      return;
+    }
+    chunks     = [];
+    mediaRec   = new MediaRecorder(micStream);
+    mediaRec.ondataavailable = e => chunks.push(e.data);
+    mediaRec.start();
+    recording  = true;
+
+    micBtn.className = 'recording';
+    micBtn.textContent = '⏹';
+    transcEl.textContent = '—';
+    transcEl.className = '';
+    typeBtn.disabled = true;
+    copyBtn.disabled = true;
+    elapsedEl.textContent = '';
+    navigator.vibrate?.(40);
+  }
+
+  async function stopRec() {
+    if (!recording) return;
+    recording = false;
+    micBtn.className = 'processing';
+    micBtn.textContent = '⏳';
+    setStatus('warn', 'Transcribing...');
+
+    await new Promise(r => { mediaRec.onstop = r; mediaRec.stop(); });
+    micStream.getTracks().forEach(t => t.stop());
+
+    const blob = new Blob(chunks, {type: mediaRec.mimeType});
+
+    try {
+      const wav  = await blobToWav(blob);
+      const fd   = new FormData();
+      fd.append('audio', wav, 'audio.wav');
+
+      const resp = await fetch('/transcribe', {method: 'POST', body: fd});
+      if (!resp.ok) {
+        const detail = await resp.json().catch(() => ({}));
+        throw new Error(detail.detail || `Server returned ${resp.status}`);
+      }
+      const data = await resp.json();
+
+      lastText             = data.text || '';
+      transcEl.textContent = lastText  || '(empty — please try again)';
+      transcEl.className   = lastText  ? 'has-text' : '';
+      elapsedEl.textContent = lastText ? `${data.elapsed}s` : '';
+
+      if (lastText) {
+        typeBtn.disabled = false;
+        copyBtn.disabled = false;
+      }
+      setStatus('ok', 'Ready');
+    } catch (err) {
+      setStatus('err', 'Error: ' + err.message);
+    }
+
+    micBtn.className   = '';
+    micBtn.textContent = '🎙';
+    navigator.vibrate?.([20, 20, 40]);
+  }
+
+  micBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (mode === 'hold') startRec();
+    else recording ? stopRec() : startRec();
+  }, {passive: false});
+
+  micBtn.addEventListener('touchend', e => {
+    e.preventDefault();
+    if (mode === 'hold') stopRec();
+  }, {passive: false});
+
+  micBtn.addEventListener('mousedown', () => {
+    if (mode === 'hold') startRec();
+    else recording ? stopRec() : startRec();
+  });
+  micBtn.addEventListener('mouseup', () => {
+    if (mode === 'hold') stopRec();
+  });
+
+  typeBtn.onclick = async () => {
+    if (!lastText) return;
+    typeBtn.textContent = '⏳';
+    typeBtn.disabled = true;
+    try {
+      const resp = await fetch('/dictate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({text: lastText}),
+      });
+      const data = await resp.json();
+      typeBtn.textContent = data.ok ? '✓ Saved' : '✗ Failed';
+      setTimeout(() => {
+        typeBtn.textContent = '📥 Save to Inbox';
+        typeBtn.disabled = false;
+      }, 2000);
+    } catch {
+      typeBtn.textContent = '📥 Save to Inbox';
+      typeBtn.disabled = false;
+    }
+  };
+
+  copyBtn.onclick = () => {
+    if (!lastText) return;
+    navigator.clipboard?.writeText(lastText);
+    copyBtn.textContent = '✓ Copied';
+    setTimeout(() => copyBtn.textContent = '📋 Copy', 2000);
+  };
+
+  document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+</body>
+</html>
