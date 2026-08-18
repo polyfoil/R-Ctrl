@@ -71,5 +71,5 @@ def set_enabled(enabled: bool, command: str | None = None) -> None:
 def default_launch_command(repo_root: Path | None = None) -> str:
     """Launch via the elevated batch file so global hotkeys keep working."""
     root = repo_root or Path(__file__).resolve().parent.parent
-    bat = root / "rctrl_widget.bat"
+    bat = root / "scripts" / "Widget.bat"
     return f'"{bat}"'

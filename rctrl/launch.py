@@ -4,7 +4,7 @@
 On Windows, importing PyQt6 before CUDA/ctranslate2 initializes makes
 `engine.load()` crash at the "Loading model..." line. The UI looked like a
 tray regression, but the root cause is import order. This module loads the
-model first, then imports `rctrl_widget` (which pulls in Qt).
+model first, then imports `rctrl.widget` (which pulls in Qt).
 """
 
 import sys
@@ -53,7 +53,7 @@ def main() -> None:
         )
     _log(f"Model ready: {info}")
 
-    import rctrl_widget as widget
+    from rctrl import widget
 
     widget.run_app(config, hw, engine)
 

@@ -13,4 +13,4 @@ Zip ve `R-Ctrl-Whisperer/` klasörü **gitignore** — commit etmeyin.
 
 Son kullanıcı: Releases’tan zip indirin, açın, `Start-R-Ctrl-Whisperer.bat` (UAC).
 
-Geliştirici: repoyu klonlayıp `setup_widget.bat` kullanın.
+Geliştirici: repoyu klonlayıp `scripts\Widget.bat` çalıştırın.

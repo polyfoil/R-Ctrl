@@ -13,4 +13,4 @@ Zips and the `R-Ctrl-Whisperer/` tree are **gitignored**. Do not commit them.
 
 End users: download the zip from Releases, unzip, run `Start-R-Ctrl-Whisperer.bat` (UAC).
 
-Developers: clone the repo and use `setup_widget.bat` instead.
+Developers: clone the repo and run `scripts\Widget.bat`.

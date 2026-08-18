@@ -10,7 +10,7 @@ from core import widget_log
 
 
 def test_launch_widget_calls_device_sync(monkeypatch):
-    import launch_widget as lw
+    import rctrl.launch as lw
 
     calls: list[tuple] = []
 
@@ -26,7 +26,7 @@ def test_launch_widget_calls_device_sync(monkeypatch):
     monkeypatch.setattr(lw, "TranscriptionEngine", lambda **kw: MagicMock(load=lambda log=None: (True, "ok")))
     monkeypatch.setattr(lw, "fatal_widget_startup", lambda *a, **k: None)
 
-    import rctrl_widget as widget
+    import rctrl.widget as widget
 
     monkeypatch.setattr(widget, "run_app", lambda *a, **k: None)
     lw.main()
@@ -59,7 +59,7 @@ def test_fatal_widget_startup_uses_turkish_copy(monkeypatch):
 
 
 def test_server_load_does_not_set_gpu_auto_fallback(tmp_path, monkeypatch):
-    """rctrl_server uses load_or_create_config only — no widget device sync."""
+    """rctrl.server uses load_or_create_config only — no widget device sync."""
     from tests.test_config import _fake_probe
 
     _fake_probe(monkeypatch, cuda_devices=0, vram_mb=12000)

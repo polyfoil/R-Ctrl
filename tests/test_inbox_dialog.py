@@ -3,8 +3,8 @@
 import pytest
 from PyQt6.QtWidgets import QApplication, QWidget
 
-import rctrl_controller as c
-import rctrl_inbox
+import rctrl.controller as c
+import rctrl.inbox
 from tests.test_controller import FakeEngine, FakeRecorder, FakeSignals, InlineThread
 from ui.i18n import translate
 
@@ -30,7 +30,7 @@ def inbox_controller(monkeypatch):
 
 def test_inbox_dialog_lists_history(qapp, inbox_controller):
     parent = QWidget()
-    dlg = rctrl_inbox.DictationInboxDialog(
+    dlg = rctrl.inbox.DictationInboxDialog(
         parent, inbox_controller, inbox_controller.config, lambda k: k
     )
     assert dlg.list.count() == 2
@@ -41,9 +41,9 @@ def test_inbox_dialog_lists_history(qapp, inbox_controller):
 
 
 def test_inbox_delete_refreshes_list(qapp, inbox_controller, monkeypatch):
-    monkeypatch.setattr(rctrl_inbox, "paste_text", lambda t: True)
+    monkeypatch.setattr(rctrl.inbox, "paste_text", lambda t: True)
     parent = QWidget()
-    dlg = rctrl_inbox.DictationInboxDialog(
+    dlg = rctrl.inbox.DictationInboxDialog(
         parent, inbox_controller, inbox_controller.config, lambda k: k
     )
     dlg._delete("bir")
@@ -52,9 +52,9 @@ def test_inbox_delete_refreshes_list(qapp, inbox_controller, monkeypatch):
 
 def test_inbox_show_event_acks_config(qapp, inbox_controller, monkeypatch):
     saved: list[dict] = []
-    monkeypatch.setattr(rctrl_inbox, "save_config", lambda cfg: saved.append(dict(cfg)))
+    monkeypatch.setattr(rctrl.inbox, "save_config", lambda cfg: saved.append(dict(cfg)))
     parent = QWidget()
-    dlg = rctrl_inbox.DictationInboxDialog(
+    dlg = rctrl.inbox.DictationInboxDialog(
         parent, inbox_controller, inbox_controller.config, lambda k: k
     )
     dlg.show()
@@ -65,9 +65,9 @@ def test_inbox_show_event_acks_config(qapp, inbox_controller, monkeypatch):
 
 def test_inbox_copy_all_joins_history(qapp, inbox_controller, monkeypatch):
     copied: list[str] = []
-    monkeypatch.setattr(rctrl_inbox, "copy_to_clipboard", lambda t: copied.append(t))
+    monkeypatch.setattr(rctrl.inbox, "copy_to_clipboard", lambda t: copied.append(t))
     parent = QWidget()
-    dlg = rctrl_inbox.DictationInboxDialog(
+    dlg = rctrl.inbox.DictationInboxDialog(
         parent, inbox_controller, inbox_controller.config, lambda k: k
     )
     copied.clear()
@@ -78,14 +78,14 @@ def test_inbox_copy_all_joins_history(qapp, inbox_controller, monkeypatch):
 
 def test_inbox_copy_all_turkish_feedback(qapp, inbox_controller, monkeypatch):
     copied: list[str] = []
-    monkeypatch.setattr(rctrl_inbox, "copy_to_clipboard", lambda t: copied.append(t))
+    monkeypatch.setattr(rctrl.inbox, "copy_to_clipboard", lambda t: copied.append(t))
     inbox_controller.config["ui_language"] = "tr"
 
     def tr(key: str) -> str:
         return translate("tr", key)
 
     parent = QWidget()
-    dlg = rctrl_inbox.DictationInboxDialog(
+    dlg = rctrl.inbox.DictationInboxDialog(
         parent, inbox_controller, inbox_controller.config, tr
     )
     copied.clear()
@@ -96,9 +96,9 @@ def test_inbox_copy_all_turkish_feedback(qapp, inbox_controller, monkeypatch):
 
 def test_inbox_selecting_row_copies_to_clipboard(qapp, inbox_controller, monkeypatch):
     copied: list[str] = []
-    monkeypatch.setattr(rctrl_inbox, "copy_to_clipboard", lambda t: copied.append(t))
+    monkeypatch.setattr(rctrl.inbox, "copy_to_clipboard", lambda t: copied.append(t))
     parent = QWidget()
-    dlg = rctrl_inbox.DictationInboxDialog(
+    dlg = rctrl.inbox.DictationInboxDialog(
         parent, inbox_controller, inbox_controller.config, lambda k: k
     )
     assert copied == ["bir"]

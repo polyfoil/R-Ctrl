@@ -10,7 +10,7 @@ from core import autostart
 
 def test_default_launch_command_points_at_bat():
     cmd = autostart.default_launch_command()
-    assert "rctrl_widget.bat" in cmd.lower()
+    assert "widget.bat" in cmd.lower()
 
 
 class _FakeKey:
@@ -53,8 +53,8 @@ def test_autostart_round_trip(monkeypatch):
     monkeypatch.setattr(autostart, "_open_run_key", _open)
     monkeypatch.setattr(autostart, "_set_value", lambda k, n, v: k.set(n, v))
     monkeypatch.setattr(autostart, "_delete_value", lambda k, n: k.delete(n))
-    autostart.set_enabled(True, '"C:\\test\\rctrl_widget.bat"')
-    assert store[autostart.VALUE_NAME] == '"C:\\test\\rctrl_widget.bat"'
+    autostart.set_enabled(True, '"C:\\test\\scripts\\Widget.bat"')
+    assert store[autostart.VALUE_NAME] == '"C:\\test\\scripts\\Widget.bat"'
     autostart.set_enabled(False)
     assert autostart.VALUE_NAME not in store
 

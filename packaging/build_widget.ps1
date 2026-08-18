@@ -20,7 +20,7 @@ if (-not (Test-Path $Py)) {
 }
 
 & $Py -m pip install -q --upgrade pip
-& $Py -m pip install -q -r requirements_widget.txt -r requirements-build.txt
+& $Py -m pip install -q -r requirements_widget.txt -r packaging/requirements-build.txt
 
 & $Py -m PyInstaller packaging/rctrl_widget.spec --noconfirm --clean
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed with exit code $LASTEXITCODE" }

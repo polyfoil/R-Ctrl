@@ -3,10 +3,10 @@
 import pytest
 from PyQt6.QtWidgets import QMenu
 
-import rctrl_controller as c
-import rctrl_inbox
-import rctrl_widget as w
-from rctrl_widget import AudioSignals
+import rctrl.controller as c
+import rctrl.inbox
+import rctrl.widget as w
+from rctrl.widget import AudioSignals
 from tests.test_controller import FakeEngine, FakeRecorder, InlineThread
 
 
@@ -73,7 +73,7 @@ def test_open_inbox_reuses_dialog_instance(widget, monkeypatch):
 
 
 def test_inbox_copy_all_flashes_widget_capsule(widget, monkeypatch):
-    monkeypatch.setattr(rctrl_inbox, "copy_to_clipboard", lambda t: None)
+    monkeypatch.setattr(rctrl.inbox, "copy_to_clipboard", lambda t: None)
     monkeypatch.setattr(w, "save_config", lambda cfg: None)
     widget._open_inbox()
     widget._inbox_dialog._copy_all()

@@ -47,8 +47,8 @@ from core.inbox_ui import ack_inbox, inbox_unread_count
 from core.inject import copy_to_clipboard, paste_text
 
 # Re-export for tests and external imports
-from rctrl_controller import DictationController, State  # noqa: F401
-from rctrl_inbox import DictationInboxDialog
+from rctrl.controller import DictationController, State  # noqa: F401
+from rctrl.inbox import DictationInboxDialog
 from ui.brand import ENGINE_LINE, HOTKEY_LINE, PRODUCT_DISPLAY, PRODUCT_NAME
 from ui.i18n import translate
 
@@ -945,8 +945,8 @@ def run_app(
 
 
 def main() -> None:
-    """Deprecated entry — use launch_widget.py so Whisper loads before PyQt6."""
-    from launch_widget import main as launch_main
+    """Deprecated entry — use ``python -m rctrl.launch`` so Whisper loads before PyQt6."""
+    from rctrl.launch import main as launch_main
 
     launch_main()
 

@@ -18,7 +18,7 @@ from PyQt6.QtWidgets import (
 from core.config import save_config
 from core.inbox_ui import ack_inbox
 from core.inject import copy_to_clipboard, paste_text
-from rctrl_controller import DictationController
+from rctrl.controller import DictationController
 
 
 class DictationInboxDialog(QDialog):

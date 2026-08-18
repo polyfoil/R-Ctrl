@@ -18,7 +18,7 @@ import pytest
 from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QSystemTrayIcon, QWidget
 
-import rctrl_widget as w
+import rctrl.widget as w
 from ui.i18n import I18N, translate
 
 

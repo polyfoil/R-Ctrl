@@ -1,7 +1,7 @@
 """Smoke tests that actually start the server app.
 
 The 2026-08-15 refactor shipped a server that could never load a model when
-started the normal way (`uvicorn rctrl_server:app`), because the engine was
+started the normal way (`uvicorn rctrl.server:app`), because the engine was
 only constructed inside `main()`. Nothing caught it: the code compiled and the
 unit tests all passed. These tests drive the real ASGI app through its real
 lifespan, which is the only thing that would have.
@@ -12,7 +12,7 @@ import time
 import pytest
 from fastapi.testclient import TestClient
 
-import rctrl_server
+import rctrl.server as rctrl_server
 
 
 class FakeEngine:
@@ -65,7 +65,7 @@ def _wait_until_ready(c, timeout=5.0):
 
 @pytest.mark.smoke
 def test_app_becomes_ready_when_started_through_lifespan(client):
-    """Running the app as `uvicorn rctrl_server:app` must load a model.
+    """Running the app as `uvicorn rctrl.server:app` must load a model.
 
     This is the regression test for the refactor bug: `main()` never runs in
     that scenario, so anything the app needs has to be built in the lifespan.

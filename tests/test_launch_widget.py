@@ -2,7 +2,7 @@
 
 import pytest
 
-import launch_widget as lw
+import rctrl.launch as lw
 
 
 class _FakeEngine:
@@ -33,7 +33,7 @@ def test_main_loads_engine_before_importing_widget(monkeypatch):
     monkeypatch.setattr(lw, "load_or_create_config", lambda: ({"model": "small", "ui_language": "en"}, {"reason": "test"}))
     monkeypatch.setattr(lw, "sync_widget_device_with_hardware", lambda c, h: c)
 
-    import rctrl_widget as widget
+    import rctrl.widget as widget
 
     monkeypatch.setattr(widget, "run_app", lambda config, hw, engine: run_args.append((config, hw, engine)))
 

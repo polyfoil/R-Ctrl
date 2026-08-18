@@ -13,7 +13,7 @@ tests pin the legal transitions down.
 import numpy as np
 import pytest
 
-import rctrl_controller as c
+import rctrl.controller as c
 from core.audio import StopReason
 from core.config import GPU_AUTO_FALLBACK_KEY
 

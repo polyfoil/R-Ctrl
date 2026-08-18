@@ -17,7 +17,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from core.config import load_or_create_config
+from core.config import app_root, load_or_create_config
 from core.engine import TranscriptionEngine
 from core.history import append_item
 
@@ -57,7 +57,7 @@ def _load_model() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # The engine is built here, not in main(): `uvicorn rctrl_server:app` never
+    # The engine is built here, not in main(): `uvicorn rctrl.server:app` never
     # calls main(), and a server that can never load a model is worse than one
     # that fails loudly. Every startup path goes through the lifespan.
     global _engine
@@ -122,14 +122,14 @@ def dictate(req: DictateReq):
 
 # Mounted last: StaticFiles at "/" swallows every path, so any route declared
 # after this line would silently never match.
-static_dir = Path(__file__).resolve().parent / "static"
+static_dir = app_root() / "static"
 static_dir.mkdir(exist_ok=True)
 app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
 
 
 def main() -> None:
     # The engine is intentionally NOT built here — the lifespan owns it, so
-    # that `uvicorn rctrl_server:app` behaves identically to this entry point.
+    # that `uvicorn rctrl.server:app` behaves identically to this entry point.
     print()
     print("=" * 58)
     print("  R-Ctrl Server — Browser Dictation (local only)")
@@ -138,7 +138,7 @@ def main() -> None:
     print()
     print("  Bound to localhost only. Other devices on the network")
     print("  cannot reach this server — see the note at the top of")
-    print("  rctrl_server.py before changing that.")
+    print("  rctrl/server.py before changing that.")
     print()
     print("  To stop: Ctrl+C")
     print("=" * 58)

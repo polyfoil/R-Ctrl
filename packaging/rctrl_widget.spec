@@ -20,12 +20,11 @@ _EXCLUDES = [
     "pytest",
     "sklearn",
     "scipy",
-    "rctrl_server",
-    "rctrl",
+    "rctrl.server",
 ]
 
 a = Analysis(
-    [str(ROOT / "launch_widget.py")],
+    [str(ROOT / "rctrl" / "launch.py")],
     pathex=[str(ROOT)],
     binaries=collect_dynamic_libs("ctranslate2"),
     datas=collect_data_files("faster_whisper"),
@@ -37,6 +36,10 @@ a = Analysis(
         "onnxruntime",
         "faster_whisper",
         "ctranslate2",
+        "rctrl.launch",
+        "rctrl.widget",
+        "rctrl.controller",
+        "rctrl.inbox",
         "ui.brand",
         "ui.i18n",
     ],

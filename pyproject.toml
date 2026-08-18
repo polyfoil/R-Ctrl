@@ -1,3 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rctrl-whisperer"
+version = "0.1.2"
+requires-python = ">=3.11"
+description = "Local Windows dictation with Whisper (R-Ctrl — Whisperer)"
+readme = "README.md"
+license = { text = "MIT" }
+
+[tool.setuptools.packages.find]
+include = ["core*", "rctrl*", "ui*"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py313"
@@ -22,7 +37,7 @@ ignore = [
 "tests/*" = ["B011", "SIM117"]
 # B008 flags `Depends()`/`File()` in argument defaults, which is exactly how
 # FastAPI declares dependencies — a false positive for this framework.
-"rctrl_server.py" = ["B008"]
+"rctrl/server.py" = ["B008"]
 
 [tool.mypy]
 python_version = "3.13"
@@ -32,7 +47,7 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 # Third-party audio/ML libraries ship no stubs.
 ignore_missing_imports = true
-files = ["core", "tests"]
+files = ["core", "rctrl", "tests"]
 
 # PyQt6's stubs declare `QMenu.addAction()` and `QMenu.addMenu()` as returning
 # `QAction | None` / `QMenu | None`. They never return None in practice, and
@@ -40,7 +55,7 @@ files = ["core", "tests"]
 # error class is silenced, and only in the menu-building file — every other
 # mypy check still applies there.
 [[tool.mypy.overrides]]
-module = "rctrl_widget"
+module = "rctrl.widget"
 disable_error_code = ["union-attr"]
 
 [tool.pytest.ini_options]

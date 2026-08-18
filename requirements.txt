@@ -1,7 +1,0 @@
-# R-Ctrl cloud CLI — OpenAI Whisper API. Requires OPENAI_API_KEY.
-openai~=2.33
-sounddevice~=0.5
-soundfile~=0.13
-numpy~=2.2
-keyboard~=0.13
-pyperclip~=1.11

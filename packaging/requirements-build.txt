@@ -1,0 +1,2 @@
+# PyInstaller and other release build tooling (maintainers only).
+pyinstaller~=6.11
