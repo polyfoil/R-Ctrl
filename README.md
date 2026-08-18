@@ -69,6 +69,36 @@ The server binds to **127.0.0.1**. Transcriptions are saved to `inbox.json` via 
 4. First launch downloads the Whisper model (up to ~3 GB). `config.json` and `inbox.json` appear **next to the `.exe`**.
 5. Logs: `%LOCALAPPDATA%\R-Ctrl\widget.log` (no console window).
 
+### GPU / CPU troubleshooting (release zip)
+
+- **CUDA Toolkit is not required.** The app does not install NVIDIA CUDA Toolkit. First run only downloads the **Whisper model** from Hugging Face.
+- **NVIDIA driver** is enough for GPU mode when the bundled runtime can use your card.
+- If you see a CUDA or GPU error (or the app closes immediately), edit `config.json` next to the `.exe`:
+
+```json
+"model": "small",
+"device": "cpu",
+"compute": "int8"
+```
+
+- Or delete `config.json` and restart to re-detect hardware (CPU-only machines get this automatically).
+- Always prefer **`Start-R-Ctrl-Whisperer.bat`** so UAC and logging work; check `widget.log` for details.
+- Optional internal flag `gpu_auto_fallback` may appear after an automatic CPU downgrade; it is cleared when you pick a model from the menu or when CUDA works again on the next widget start.
+
+Minimal CPU `config.json` (all keys the app understands):
+
+```json
+{
+  "model": "small",
+  "device": "cpu",
+  "compute": "int8",
+  "hotkey": "right ctrl",
+  "language": null,
+  "ui_language": "en",
+  "input_device": null
+}
+```
+
 Maintainers build the zip with `packaging\build_widget.ps1` (see `dist/README.md`).
 
 ## Install from source (developers)

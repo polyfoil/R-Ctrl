@@ -9,7 +9,7 @@ from enum import Enum
 import numpy as np
 
 from core.audio import Recorder, StopReason
-from core.config import compute_for_device, save_config
+from core.config import GPU_AUTO_FALLBACK_KEY, compute_for_device, save_config
 from core.engine import TranscriptionEngine
 from core.history import INBOX_MAX_ITEMS, clear_storage, load_items, save_items
 from core.inject import copy_to_clipboard, paste_text
@@ -129,6 +129,7 @@ class DictationController:
         self.engine.compute = compute_for_device(self.engine.device)
         self.config["model"] = model_name
         self.config["compute"] = self.engine.compute
+        self.config.pop(GPU_AUTO_FALLBACK_KEY, None)
         save_config(self.config)
         self.load_model_async()
         return True

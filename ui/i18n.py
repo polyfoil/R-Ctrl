@@ -59,6 +59,14 @@ I18N: dict[str, dict[str, str]] = {
         "tray_show": "Göster",
         "tray_hide": "Gizle",
         "tray_quit": "Çıkış",
+        "startup_fatal_title": "R-Ctrl — Whisperer",
+        "startup_fatal_body": (
+            "{message}\n\n"
+            "CUDA Toolkit gerekmez — yalnızca ilk çalıştırmada Hugging Face modeli iner.\n"
+            "Yalnızca CPU için .exe yanındaki config.json:\n"
+            '  "model": "small", "device": "cpu", "compute": "int8"\n\n'
+            "Günlük: {log_path}"
+        ),
     },
     "en": {
         "loading_model": "Loading Model...",
@@ -114,6 +122,14 @@ I18N: dict[str, dict[str, str]] = {
         "tray_show": "Show",
         "tray_hide": "Hide",
         "tray_quit": "Quit",
+        "startup_fatal_title": "R-Ctrl — Whisperer",
+        "startup_fatal_body": (
+            "{message}\n\n"
+            "CUDA Toolkit is not required — only a Hugging Face model download on first run.\n"
+            "For CPU-only, edit config.json next to the .exe:\n"
+            '  "model": "small", "device": "cpu", "compute": "int8"\n\n'
+            "Log: {log_path}"
+        ),
     },
 }
 

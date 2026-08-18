@@ -10,9 +10,9 @@ model first, then imports `rctrl_widget` (which pulls in Qt).
 import sys
 from contextlib import suppress
 
-from core.config import load_or_create_config
+from core.config import load_or_create_config, sync_widget_device_with_hardware
 from core.engine import TranscriptionEngine
-from core.widget_log import configure_widget_file_log
+from core.widget_log import configure_widget_file_log, fatal_widget_startup
 
 
 def _log(msg: str) -> None:
@@ -29,6 +29,7 @@ def main() -> None:
     configure_widget_file_log()
 
     config, hw = load_or_create_config()
+    config = sync_widget_device_with_hardware(config, hw)
     engine = TranscriptionEngine(
         model_size=config.get("model", "large-v3"),
         device=config.get("device", "cuda"),
@@ -46,8 +47,10 @@ def main() -> None:
     _log(f"Loading model: {engine.model_size} ({engine.device}) ...")
     ok, info = engine.load(log=_log)
     if not ok:
-        _log(f"Model load error: {info}")
-        sys.exit(1)
+        fatal_widget_startup(
+            f"Model load error: {info}",
+            ui_language=str(config.get("ui_language", "en")),
+        )
     _log(f"Model ready: {info}")
 
     import rctrl_widget as widget

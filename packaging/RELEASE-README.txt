@@ -6,10 +6,17 @@ R-Ctrl — Whisperer (local) — Windows package
    Or run R-Ctrl-Whisperer.exe the same way — admin is required for the hotkey.
 3. First launch downloads the speech model from Hugging Face (up to ~3 GB).
    Cache: %USERPROFILE%\.cache\huggingface\hub
+   CUDA Toolkit is NOT required — only this model download.
 4. config.json and inbox.json are created next to the .exe on first use.
+
+If the app fails to start or shows a GPU/CUDA error:
+  - Open config.json next to the .exe and set:
+      "model": "small", "device": "cpu", "compute": "int8"
+  - Or delete config.json and start again (CPU is chosen automatically when needed).
+  - Details: %LOCALAPPDATA%\R-Ctrl\widget.log
 
 Logs (no console window): %LOCALAPPDATA%\R-Ctrl\widget.log
 
-NVIDIA GPU recommended. Needs Windows 10/11.
+NVIDIA GPU optional (faster). CPU-only works with small model.
 
 Source & issues: see the GitHub repository README.

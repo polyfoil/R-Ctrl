@@ -15,6 +15,7 @@ import pytest
 
 import rctrl_controller as c
 from core.audio import StopReason
+from core.config import GPU_AUTO_FALLBACK_KEY
 
 # --- doubles --------------------------------------------------------------
 
@@ -258,9 +259,11 @@ def test_silent_microphone_is_reported_differently(ctl):
 
 def test_model_change_from_idle_is_accepted(ctl):
     _ready(ctl)
+    ctl.config[GPU_AUTO_FALLBACK_KEY] = True
     assert ctl.change_model("medium") is True
     assert ctl.engine.model_size == "medium"
     assert ctl.config["model"] == "medium"
+    assert GPU_AUTO_FALLBACK_KEY not in ctl.config
 
 
 def test_model_change_is_rejected_while_transcribing(ctl):

@@ -30,7 +30,8 @@ def test_main_loads_engine_before_importing_widget(monkeypatch):
         return eng
 
     monkeypatch.setattr(lw, "TranscriptionEngine", _factory)
-    monkeypatch.setattr(lw, "load_or_create_config", lambda: ({"model": "small"}, {"reason": "test"}))
+    monkeypatch.setattr(lw, "load_or_create_config", lambda: ({"model": "small", "ui_language": "en"}, {"reason": "test"}))
+    monkeypatch.setattr(lw, "sync_widget_device_with_hardware", lambda c, h: c)
 
     import rctrl_widget as widget
 
@@ -44,10 +45,12 @@ def test_main_loads_engine_before_importing_widget(monkeypatch):
 
 
 def test_main_exits_when_model_load_fails(monkeypatch):
-    monkeypatch.setattr(lw, "load_or_create_config", lambda: ({"model": "small"}, {"reason": "test"}))
+    monkeypatch.setattr(lw, "load_or_create_config", lambda: ({"model": "small", "ui_language": "en"}, {"reason": "test"}))
+    monkeypatch.setattr(lw, "sync_widget_device_with_hardware", lambda c, h: c)
     engine = _FakeEngine()
     engine.load_ok = False
     monkeypatch.setattr(lw, "TranscriptionEngine", lambda **kw: engine)
+    monkeypatch.setattr(lw, "fatal_widget_startup", lambda msg, **kw: (_ for _ in ()).throw(SystemExit(1)))
 
     with pytest.raises(SystemExit) as exc:
         lw.main()

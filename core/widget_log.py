@@ -50,3 +50,20 @@ def configure_widget_file_log() -> Path:
     sys.stdout = _Tee(sys.stdout, handle)
     sys.stderr = _Tee(sys.stderr, handle)
     return path
+
+
+def fatal_widget_startup(message: str, *, ui_language: str = "en", title: str | None = None) -> None:
+    """Log, show a Windows error dialog when there is no console, then exit."""
+    from ui.i18n import translate
+
+    print(message, flush=True)
+    if sys.platform == "win32":
+        log_file = log_path()
+        lang = ui_language if ui_language in ("tr", "en") else "en"
+        body = translate(lang, "startup_fatal_body").format(message=message, log_path=log_file)
+        box_title = title or translate(lang, "startup_fatal_title")
+        with suppress(Exception):
+            import ctypes
+
+            ctypes.windll.user32.MessageBoxW(0, body, box_title, 0x10)
+    raise SystemExit(1)

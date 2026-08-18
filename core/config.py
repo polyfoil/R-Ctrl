@@ -16,6 +16,9 @@ def app_root() -> Path:
 
 CONFIG_PATH = app_root() / "config.json"
 
+# Set when widget launcher downgrades cuda→cpu; cleared on user model change or CUDA recovery.
+GPU_AUTO_FALLBACK_KEY = "gpu_auto_fallback"
+
 # VRAM thresholds (MB) that decide which model a GPU can comfortably hold.
 VRAM_LARGE_MB = 8000
 VRAM_MEDIUM_MB = 4000
@@ -78,10 +81,14 @@ def detect_hardware() -> dict:
 
     try:
         import ctranslate2
-        count = ctranslate2.get_cuda_device_count()
-        cuda_available = count > 0
-        probes["ctranslate2"] = {"ok": cuda_available, "detail": f"{count} CUDA device(s)"}
+
+        cuda_devices = ctranslate2.get_cuda_device_count()
+        probes["ctranslate2"] = {
+            "ok": cuda_devices > 0,
+            "detail": f"{cuda_devices} CUDA device(s)",
+        }
     except Exception as e:
+        cuda_devices = 0
         probes["ctranslate2"] = {"ok": False, "detail": str(e) or type(e).__name__}
 
     try:
@@ -93,10 +100,11 @@ def detect_hardware() -> dict:
             parts = out.split("\n")[0].split(",")
             gpu_name = parts[0].strip()
             vram_mb = int(parts[1].strip())
-            cuda_available = True
         probes["nvidia_smi"] = {"ok": bool(out), "detail": out or "no output"}
     except Exception as e:
         probes["nvidia_smi"] = {"ok": False, "detail": str(e) or type(e).__name__}
+
+    cuda_available = cuda_devices > 0
 
     if cuda_available and vram_mb >= VRAM_LARGE_MB:
         model, device, compute = "large-v3", "cuda", "float16"
@@ -106,7 +114,14 @@ def detect_hardware() -> dict:
         reason = f"{gpu_name} ({vram_mb // 1024} GB VRAM) — 'medium' selected."
     elif cuda_available:
         model, device, compute = "small", "cuda", "float16"
-        reason = f"{gpu_name} — 'small' selected."
+        label = gpu_name or "NVIDIA GPU"
+        reason = f"{label} — 'small' selected."
+    elif gpu_name:
+        model, device, compute = "small", "cpu", "int8"
+        reason = (
+            f"{gpu_name} — GPU detected but CUDA inference is not available; "
+            "'small' on CPU (int8) selected. No CUDA Toolkit install required."
+        )
     else:
         model, device, compute = "small", "cpu", "int8"
         reason = "No NVIDIA GPU detected. CPU selected with 'small (int8)'."
@@ -121,6 +136,48 @@ def detect_hardware() -> dict:
         "reason": reason,
         "probes": probes,
     }
+
+
+def sync_widget_device_with_hardware(
+    cfg: dict,
+    hw: dict,
+    path: Path = CONFIG_PATH,
+    *,
+    persist: bool = True,
+) -> dict:
+    """Align widget device settings with runtime hardware (widget launcher only).
+
+    Downgrades invalid cuda to cpu and persists. Restores GPU defaults when CUDA
+    works again after a prior auto-fallback. Cloud CLI and server must not call this.
+    """
+    changed = False
+
+    if hw.get("cuda_available") and cfg.get(GPU_AUTO_FALLBACK_KEY):
+        for key in ("model", "device", "compute"):
+            if cfg.get(key) != hw.get(key):
+                cfg[key] = hw[key]
+                changed = True
+        if GPU_AUTO_FALLBACK_KEY in cfg:
+            del cfg[GPU_AUTO_FALLBACK_KEY]
+            changed = True
+        if changed:
+            _log("CUDA available again — restored GPU settings from hardware detection.")
+
+    elif cfg.get("device") == "cuda" and not hw.get("cuda_available"):
+        cfg["device"] = "cpu"
+        cfg["compute"] = "int8"
+        if cfg.get("model") in ("large-v3", "medium"):
+            cfg["model"] = "small"
+        cfg[GPU_AUTO_FALLBACK_KEY] = True
+        changed = True
+        _log(
+            "Saved cuda device unavailable at runtime — switched to CPU (small/int8). "
+            "CUDA Toolkit is not required."
+        )
+
+    if changed and persist:
+        save_config(cfg, path)
+    return cfg
 
 
 def load_or_create_config(path: Path = CONFIG_PATH) -> tuple[dict, dict]:

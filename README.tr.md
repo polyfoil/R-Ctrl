@@ -69,6 +69,36 @@ Sunucu **127.0.0.1**’e bağlıdır. Transkripsiyon **Save to Inbox** ile `inbo
 4. İlk açılışta Whisper modeli iner (~3 GB). `config.json` ve `inbox.json` **`.exe` ile aynı klasörde** oluşur.
 5. Günlük: `%LOCALAPPDATA%\R-Ctrl\widget.log` (konsol penceresi yok).
 
+### GPU / CPU sorun giderme (release zip)
+
+- **CUDA Toolkit gerekmez.** Uygulama Toolkit indirmez; ilk çalıştırmada yalnızca **Whisper modeli** Hugging Face’ten iner.
+- GPU için genelde güncel **NVIDIA sürücüsü** yeterlidir.
+- CUDA/GPU hatası veya program hemen kapanıyorsa `.exe` yanındaki `config.json` dosyasını düzenleyin:
+
+```json
+"model": "small",
+"device": "cpu",
+"compute": "int8"
+```
+
+- Veya `config.json` silinip yeniden başlatın (donanım yeniden algılanır).
+- **`Start-R-Ctrl-Whisperer.bat`** kullanın; ayrıntılar `widget.log` dosyasında.
+- Otomatik CPU düşüşünden sonra `gpu_auto_fallback` görülebilir; menüden model seçince veya CUDA tekrar çalışınca temizlenir.
+
+Örnek CPU `config.json`:
+
+```json
+{
+  "model": "small",
+  "device": "cpu",
+  "compute": "int8",
+  "hotkey": "right ctrl",
+  "language": null,
+  "ui_language": "tr",
+  "input_device": null
+}
+```
+
 Zip üretimi: `packaging\build_widget.ps1` (`dist/README.tr.md`).
 
 ## Kaynaktan kurulum (geliştiriciler)
