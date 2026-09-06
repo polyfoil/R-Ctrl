@@ -1,5 +1,7 @@
 **Dil / Language:** [English](README.md) · **Türkçe**
 
+[![tests](https://github.com/polyfoil/R-Ctrl/actions/workflows/test.yml/badge.svg)](https://github.com/polyfoil/R-Ctrl/actions/workflows/test.yml)
+
 # R-Ctrl — Whisperer (local)
 
 **R-Ctrl — Whisperer**, yerel Windows diktesidir: kısayolu basılı tutun, konuşun, makinede **Whisper** (faster-whisper) ile metne çevirin, odaktaki uygulamaya **yapıştırın**. Varsayılan kısayol: **Sağ Ctrl** (`R-Ctrl`). Ses cihazdan çıkmaz; widget için API anahtarı gerekmez.
@@ -83,6 +85,14 @@ Ayrıntı: [CONTRIBUTING.md](CONTRIBUTING.md). Güvenlik: [SECURITY.md](SECURITY
 2. Değiştirdiğiniz mantık için test; `pytest`, `ruff`, `mypy`.
 3. `config.json`, `inbox.json`, `.pm/`, `Docs/`, `.cursor/`, zip commit etmeyin.
 4. Yapıştırma yalnızca `core.inject.paste_text()`; sunucu localhost dışına çıkmaz (auth+TLS olmadan).
+
+## Testler
+
+```bash
+python -m pytest
+set RCTRL_E2E=1
+python -m pytest -m slow
+```
 
 ## Bilinen sınırlar
 
