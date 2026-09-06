@@ -12,7 +12,6 @@ import os
 
 import numpy as np
 import pytest
-import soundfile as sf
 
 from core.audio import SAMPLE_RATE
 from core.engine import TranscriptionEngine
@@ -20,6 +19,8 @@ from core.text import format_transcript
 
 
 def _silent_wav_buffer(seconds: float = 1.5) -> io.BytesIO:
+    import soundfile as sf
+
     samples = int(SAMPLE_RATE * seconds)
     audio = np.zeros(samples, dtype=np.float32)
     buf = io.BytesIO()
