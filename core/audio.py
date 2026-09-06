@@ -6,7 +6,7 @@ callable so both the Qt widget and the headless CLI can use the same recorder.
 
 import time
 from collections.abc import Callable
-from enum import Enum
+from enum import StrEnum
 
 import numpy as np
 import sounddevice as sd
@@ -25,7 +25,7 @@ _LEVEL_INTERVAL = 1.0 / 30.0
 _LEVEL_GAIN = 60.0
 
 
-class StopReason(str, Enum):
+class StopReason(StrEnum):
     """Why a recording ended.
 
     NO_AUDIO and TOO_SHORT used to be indistinguishable — both came back as
