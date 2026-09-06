@@ -45,12 +45,13 @@ def detect_system_ui_language() -> str:
                 return "tr"
         except Exception:
             pass
-    for getter in (
-        lambda: locale.getlocale(locale.LC_MESSAGES),
-        locale.getlocale,
-    ):
+    categories: list[int | None] = [None]
+    lc_messages = getattr(locale, "LC_MESSAGES", None)
+    if isinstance(lc_messages, int):
+        categories.insert(0, lc_messages)
+    for category in categories:
         try:
-            loc = getter()
+            loc = locale.getlocale(category) if category is not None else locale.getlocale()
         except Exception:
             continue
         if not loc:
