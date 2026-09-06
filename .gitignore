@@ -43,7 +43,8 @@ CLAUDE.md
 CLAUDE.tr.md
 .cursorrules
 
-# Agent / editor local settings
+# Agent / editor local settings — never publish
+.cursor/
 .claude/
 
 # Editor / OS

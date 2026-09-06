@@ -1,0 +1,29 @@
+name: Bug report
+description: Widget, server, hotkey, or transcription is wrong
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options: [Widget, Server, Packaging / zip]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "Windows 11, Python 3.11, NVIDIA / CPU"
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true

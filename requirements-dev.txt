@@ -1,3 +1,5 @@
-# Test tooling. Install alongside one of the runtime requirement files.
+# Test and lint tooling. Install alongside one of the runtime requirement files.
 pytest~=7.4
 pytest-cov~=4.1
+ruff>=0.6
+mypy>=1.11

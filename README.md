@@ -1,5 +1,7 @@
 **Language / Dil:** **English** · [Türkçe](README.tr.md)
 
+[![tests](https://github.com/polyfoil/R-Ctrl/actions/workflows/test.yml/badge.svg)](https://github.com/polyfoil/R-Ctrl/actions/workflows/test.yml)
+
 # R-Ctrl — Whisperer (local)
 
 **R-Ctrl — Whisperer** is local Windows dictation: hold a hotkey, speak, transcribe on your machine with **Whisper** (faster-whisper), and **paste** into the focused app. Default hotkey: **Right Ctrl** (`R-Ctrl`). Audio stays on-device; the widget needs no API key.
@@ -63,7 +65,7 @@ GPU issues: set `"device": "cpu"`, `"model": "small"`, `"compute": "int8"` in `c
 ## Install from source
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/polyfoil/R-Ctrl.git
 cd R-Ctrl
 scripts\Widget.bat
 ```
@@ -93,9 +95,11 @@ Do not edit the gitignored `R-Ctrl-Widget/` folder (old zip copy).
 
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md). Security reports: [SECURITY.md](SECURITY.md).
+
 1. Widget work: `scripts\Widget.bat` or `python -m rctrl.launch` (CUDA before Qt).
 2. Add tests for logic you change; run `pytest`, `ruff check .`, `mypy`.
-3. Do not commit `config.json`, `inbox.json`, `.pm/`, `Docs/`, or release zips.
+3. Do not commit `config.json`, `inbox.json`, `.pm/`, `Docs/`, `.cursor/`, or release zips.
 4. Paste injection only via `core.inject.paste_text()`; server stays on localhost unless auth + TLS.
 
 ## Tests

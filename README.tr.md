@@ -48,7 +48,7 @@ GPU sorunu: `config.json` içinde `"device": "cpu"`, `"model": "small"`, `"compu
 ## Kaynak koddan kurulum
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/polyfoil/R-Ctrl.git
 cd R-Ctrl
 scripts\Widget.bat
 ```
@@ -77,9 +77,11 @@ Sunucu **127.0.0.1**; inbox’a kayıt var, tuş enjeksiyonu yok.
 
 ## Katkı
 
+Ayrıntı: [CONTRIBUTING.md](CONTRIBUTING.md). Güvenlik: [SECURITY.md](SECURITY.md).
+
 1. Widget: `scripts\Widget.bat` veya `python -m rctrl.launch`.
 2. Değiştirdiğiniz mantık için test; `pytest`, `ruff`, `mypy`.
-3. `config.json`, `inbox.json`, `.pm/`, `Docs/`, zip commit etmeyin.
+3. `config.json`, `inbox.json`, `.pm/`, `Docs/`, `.cursor/`, zip commit etmeyin.
 4. Yapıştırma yalnızca `core.inject.paste_text()`; sunucu localhost dışına çıkmaz (auth+TLS olmadan).
 
 ## Bilinen sınırlar
